@@ -10,6 +10,7 @@ Elle est conçue pour être utilisée comme **microservice d'authentification** 
 
 - Gérer les utilisateurs (CRUD)
 - Assigner des rôles aux utilisateurs
+- Assigner des permissions aux rôles
 - Authentification avec JWT (access + refresh tokens)
 - Démonstration via Swagger UI
 
@@ -44,7 +45,7 @@ mvn spring-boot:run
 ```
 ### 4. Base de Données Initiale
 La classe DataInitializer crée automatiquement :
-- Rôles : ADMIN, USER, MANAGER
+- Rôles : ADMIN
 - Permissions : CREATE, READ, UPDATE, DELETE
 - Utilisateur admin par défaut :
    - Email: admin@example.com
@@ -69,10 +70,10 @@ La classe DataInitializer crée automatiquement :
   - Testez tous les endpoints sécurisés
 ## Conclusion
 Ce microservice fournit une solution complète pour :
-✅ Authentification JWT
-✅ Gestion des utilisateurs
-✅ Contrôle d'accès basé sur les rôles et les permissions
-✅ Documentation interactive avec Swagger
-✅ Configuration facile et prête à l'emploi
+- ✅ Authentification JWT
+- ✅ Gestion des utilisateurs
+- ✅ Contrôle d'accès basé sur les rôles et les permissions
+- ✅ Documentation interactive avec Swagger
+- ✅ Configuration facile et prête à l'emploi
 
 L'utilisateur admin créé automatiquement permet de tester immédiatement toutes les fonctionnalités sans configuration manuelle supplémentaire.
