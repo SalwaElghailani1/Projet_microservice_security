@@ -1,0 +1,76 @@
+package faculte.microservice_security.web;
+
+import faculte.microservice_security.entities.PermissionEntity;
+import faculte.microservice_security.service.PermissionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@Tag(name = "Permissions", description = "API pour la gestion des permissions")
+@RestController
+@RequestMapping("/v1/permissions")
+public class PermissionController {
+
+    private final PermissionService permissionService;
+
+    public PermissionController(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
+
+    @Operation(
+            summary = "Créer une nouvelle permission",
+            description = "Crée une permission avec un nom spécifique"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Permission créée avec succès",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PermissionEntity.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Nom de permission invalide ou déjà utilisé"
+            )
+    })
+    @PostMapping
+    public ResponseEntity<PermissionEntity> createPermission(
+            @Parameter(
+                    name = "name",
+                    description = "Nom de la permission à créer",
+                    required = true,
+                    example = "CREATE_USERS"
+            )
+            @RequestParam String name) {
+        PermissionEntity permission = permissionService.createPermission(name);
+        return ResponseEntity.status(HttpStatus.CREATED).body(permission);
+    }
+    @Operation(
+            summary = "Lister toutes les permissions",
+            description = "Retourne la liste de toutes les permissions existantes"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Liste des permissions récupérée avec succès",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PermissionEntity.class)
+                    )
+            )
+    })
+    @GetMapping
+    public ResponseEntity<?> getAllPermissions() {
+        return ResponseEntity.ok(permissionService.getAllPermissions());
+    }
+
+}
