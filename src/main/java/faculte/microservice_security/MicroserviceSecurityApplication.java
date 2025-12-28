@@ -18,8 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
                 description = "API pour la gestion des utilisateurs, rôles et permissions",
                 version = "1.0.0",
                 contact = @Contact(
-                        name = "Votre Nom",
-                        email = "votre.email@example.com"
+                        name = "salwa",
+                        email = "salwa.elghailani@etu.uae.ac.ma"
                 )
         ),
         servers = {

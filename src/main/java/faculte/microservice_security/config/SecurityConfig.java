@@ -56,7 +56,6 @@ public class SecurityConfig {
                         .requestMatchers("/v1/users/login").permitAll()
                         .requestMatchers("/v1/users/refresh").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

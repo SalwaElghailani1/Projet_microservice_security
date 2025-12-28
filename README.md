@@ -63,7 +63,7 @@ La classe DataInitializer crée automatiquement :
 - ✅ Base de données pré-configurée : Utilisateur admin créé automatiquement
 ## Tests
   Pour tester le microservice :
-  - Accédez à Swagger : http://localhost:8070/swagger-ui.html
+  - Accédez à Swagger : http://localhost:8070/swagger-ui/index.html
   - Authentifiez-vous avec admin@example.com/admin123 
   - Copiez le token JWT 
   - Cliquez sur "Authorize" en haut et collez Bearer <votre-token>
