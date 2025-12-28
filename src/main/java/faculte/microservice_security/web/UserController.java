@@ -224,6 +224,29 @@ public class UserController {
 
 
     @PostMapping("/register")
+    @Operation(
+            summary = "Inscription d’un nouvel utilisateur (CLIENT)",
+            description = "Permet à un utilisateur de s’inscrire avec son email et son mot de passe. "
+                    + "Le rôle est automatiquement défini à CLIENT et ne peut pas être choisi par l’utilisateur."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Utilisateur inscrit avec succès",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Données invalides (email ou mot de passe incorrect)"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Adresse email déjà utilisée"
+            )
+    })
     public ResponseEntity<UserResponseDTO> registerUserClient(
             @Valid @RequestBody UserRequestDTO request) {
 
