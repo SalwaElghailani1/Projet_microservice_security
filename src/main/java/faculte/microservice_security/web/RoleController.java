@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Roles", description = "API pour la gestion des rôles et permissions")
@@ -42,6 +43,7 @@ public class RoleController {
                     description = "Nom du rôle invalide ou déjà utilisé"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Role> createRole(
             @Parameter(
@@ -69,6 +71,7 @@ public class RoleController {
                     description = "Rôle ou permission non trouvé"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{roleName}/permissions")
     public ResponseEntity<String> assignPermissionToRole(
             @Parameter(
@@ -102,6 +105,7 @@ public class RoleController {
                     )
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<?> getAllRoles() {
         return ResponseEntity.ok(roleService.getAllRoles());

@@ -55,6 +55,7 @@ public class SecurityConfig {
                         // Permettre login, refresh et Swagger sans authentification
                         .requestMatchers("/v1/users/login").permitAll()
                         .requestMatchers("/v1/users/refresh").permitAll()
+                        .requestMatchers("/v1/users/register").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )

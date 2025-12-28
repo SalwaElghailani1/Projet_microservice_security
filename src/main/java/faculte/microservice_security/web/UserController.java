@@ -18,8 +18,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -83,6 +85,7 @@ public class UserController {
                     description = "Email déjà utilisé"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO request) {
         UserResponseDTO responce = userService.createUser(request);
@@ -115,6 +118,7 @@ public class UserController {
                     description = "Utilisateur non trouvé"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(
             @Parameter(
@@ -139,6 +143,7 @@ public class UserController {
                     schema = @Schema(implementation = UserResponseDTO[].class)
             )
     )
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -158,6 +163,7 @@ public class UserController {
                     description = "Utilisateur non trouvé"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(
             @Parameter(
@@ -188,6 +194,7 @@ public class UserController {
                     description = "Utilisateur ou rôle non trouvé"
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{userId}/roles")
     public ResponseEntity<UserResponseDTO> assignRoleToUser(
             @Parameter(
@@ -216,7 +223,15 @@ public class UserController {
 
 
 
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> registerUserClient(
+            @Valid @RequestBody UserRequestDTO request) {
 
+        // Forcer le rôle à CLIENT
+        request.setRole(Set.of("CLIENT"));
+        UserResponseDTO response = userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
 //AuthController
 
@@ -248,6 +263,7 @@ public class UserController {
                     content = @Content
             )
     })
+
     public ResponseEntity<UserResponseDTO> login(
             @Parameter(description = "Informations d'authentification", required = true)
             @RequestBody UserRequestDTO request) {
@@ -325,7 +341,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
-
     @PostMapping("/refresh")
     @Operation(
             summary = "Rafraîchir le token d'accès",
@@ -427,7 +442,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/logout")
     @Operation(
             summary = "Déconnexion utilisateur",
@@ -460,7 +475,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors de la déconnexion");
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/logout-all")
     @Operation(
             summary = "Déconnexion globale",
