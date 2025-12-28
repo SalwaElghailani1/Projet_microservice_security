@@ -25,6 +25,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+// Imports nécessaires pour la configuration CORS
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -46,20 +53,59 @@ public class SecurityConfig {
         return new ProviderManager(authProvider);
     }
 
+    // ======================= CONFIGURATION CORS =======================
+    // Cette configuration permet d'autoriser le Frontend Angular
+    // (http://localhost:4200) à communiquer avec le backend Spring Boot.
+    // Sans CORS, le navigateur bloque les requêtes pour des raisons de sécurité.
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Origine autorisée (Frontend Angular)
+        config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+
+        // Méthodes HTTP autorisées (GET, POST, PUT, DELETE, etc.)
+        config.setAllowedMethods(Arrays.asList("*"));
+
+        // Headers autorisés (Authorization est nécessaire pour JWT)
+        config.setAllowedHeaders(Arrays.asList("*"));
+
+        // Autoriser l'envoi du header Authorization (JWT)
+        config.setAllowCredentials(true);
+
+        // Appliquer cette configuration à toutes les routes de l'application
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                // Activation de CORS dans Spring Security
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .sessionManagement(sess ->
+                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .authorizeHttpRequests(auth -> auth
-                        // Permettre login, refresh et Swagger sans authentification
                         .requestMatchers("/v1/users/login").permitAll()
                         .requestMatchers("/v1/users/refresh").permitAll()
                         .requestMatchers("/v1/users/register").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(Customizer.withDefaults())
+                )
+
                 .build();
     }
 
@@ -68,12 +114,17 @@ public class SecurityConfig {
         JWK jwk = new RSAKey.Builder(rsaKeys.publicKey())
                 .privateKey(rsaKeys.privateKey())
                 .build();
-        JWKSource<SecurityContext> jwkSource = new ImmutableJWKSet<>(new JWKSet(jwk));
+
+        JWKSource<SecurityContext> jwkSource =
+                new ImmutableJWKSet<>(new JWKSet(jwk));
+
         return new NimbusJwtEncoder(jwkSource);
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
+        return NimbusJwtDecoder
+                .withPublicKey(rsaKeys.publicKey())
+                .build();
     }
 }
