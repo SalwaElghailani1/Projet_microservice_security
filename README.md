@@ -51,6 +51,16 @@ La classe DataInitializer crée automatiquement :
    - Email: admin@example.com
    - Mot de passe: admin123
    - Rôle: ADMIN avec toutes les permissions
+Pour ajouter plusieurs rôles à ta table roles dans la base de données
+  ```sql
+     INSERT INTO roles (name, description) VALUES
+     ('CLIENT', 'Rôle par défaut pour les utilisateurs clients')
+     ('HOUSEKEEPING', 'Maintenir les chambres propres, disponibles et prêtes à l’usage.'),
+     ('RECEPTIONNISTE', 'Assurer la gestion quotidienne des clients et des réservations au niveau de la réception.'),
+     ('MANAGER', 'Superviser l’ensemble des activités de l’hôtel et assurer la prise de décision stratégique.'),
+     ('MAINTENANCE', 'Assurer le bon fonctionnement technique des chambres et des installations de l’hôtel.'),
+     ('COMPTABLE', 'Rôle Gérer les aspects financiers et comptables de l’hôtel');
+  ```
 ## Page d'Accueil Swagger
 ![Swagger](images/1.png)
 ![Swagger](images/2.png)
