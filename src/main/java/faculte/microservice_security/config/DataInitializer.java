@@ -13,7 +13,6 @@
 //import java.util.HashSet;
 //import java.util.Set;
 //
-//
 //@Component
 //public class DataInitializer implements CommandLineRunner {
 //
@@ -35,7 +34,6 @@
 //    @Override
 //    public void run(String... args) throws Exception {
 //
-//        //  Créer les permissions par défaut si elles n'existent pas
 //        String[] defaultPermissions = {"USER_CREATE", "USER_READ", "USER_UPDATE", "USER_DELETE"};
 //        Set<PermissionEntity> permissions = new HashSet<>();
 //        for (String permName : defaultPermissions) {
@@ -48,24 +46,21 @@
 //            permissions.add(perm);
 //        }
 //
-//        //  Créer le rôle ADMIN si pas existant
 //        Role adminRole = roleRepository.findByName("ADMIN")
 //                .orElseGet(() -> {
 //                    Role role = new Role();
 //                    role.setName("ADMIN");
 //                    role.setDescription("Role administrateur principal");
-//                    role.setPermissions(permissions); // assigner permissions ici
+//                    role.setPermissions(permissions);
 //                    return roleRepository.save(role);
 //                });
 //
-//        //  Vérifier si l'admin existe déjà
 //        boolean adminExists = userRepository.findAll().stream()
 //                .anyMatch(u -> u.getRoles().contains(adminRole));
 //
-//        // Créer l'Admin User si nécessaire
 //        if (!adminExists) {
 //            User adminUser = new User();
-//            adminUser.setEmail("admin@example.com");  // utilisé comme username
+//            adminUser.setEmail("admin@example.com");
 //            adminUser.setPassword(passwordEncoder.encode("admin123"));
 //            adminUser.setActive(true);
 //            adminUser.getRoles().add(adminRole);
@@ -77,5 +72,3 @@
 //        }
 //    }
 //}
-//
-//
