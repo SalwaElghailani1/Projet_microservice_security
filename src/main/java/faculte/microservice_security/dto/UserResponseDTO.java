@@ -14,6 +14,8 @@ import java.util.Set;
 public class UserResponseDTO {
 
     private Integer id;
+    private String firstName;
+    private String lastName;
     private String email;
     private boolean active;
     private LocalDateTime createdAt;

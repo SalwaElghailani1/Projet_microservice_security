@@ -50,7 +50,8 @@ public class UserServiceImpl implements UserService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setActive(true);
-
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         // Assigner le rôle si fourni
         if(request.getRole() != null){
             for (String roleName : request.getRole()) {
@@ -66,6 +67,8 @@ public class UserServiceImpl implements UserService {
         // Mapper vers le DTO de réponse
         UserResponseDTO response = new UserResponseDTO();
         response.setId(user.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());
         response.setActive(user.isActive());
         response.setRoles(user.getRoles().stream()

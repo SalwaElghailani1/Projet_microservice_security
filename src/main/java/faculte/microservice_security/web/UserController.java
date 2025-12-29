@@ -334,6 +334,8 @@ public class UserController {
                     .subject(authentication.getName())
                     .claim("authorities", authorities)
                     .claim("email", user.getEmail())
+                    .claim("prenom", user.getFirstName())
+                    .claim("nom", user.getLastName())
                     .claim("userId", user.getId())
                     .claim("roles", allRoles)
                     .claim("permissions", allPermissions)
@@ -349,6 +351,8 @@ public class UserController {
             UserResponseDTO response = new UserResponseDTO();
             response.setId(user.getId());
             response.setEmail(user.getEmail());
+            response.setFirstName(user.getFirstName());
+            response.setLastName(user.getLastName());
             response.setActive(user.isActive());
             response.setCreatedAt(user.getCreatedAt());
             response.setUpdatedAt(user.getUpdatedAt());
@@ -435,6 +439,8 @@ public class UserController {
                     .subject(user.getEmail())
                     .claim("email", user.getEmail())
                     .claim("userId", user.getId())
+                    .claim("prenom", user.getFirstName())
+                    .claim("nom", user.getLastName())
                     .claim("roles", allRoles)
                     .claim("permissions", allPermissions)
                     .claim("type", "access")
@@ -451,6 +457,8 @@ public class UserController {
             // 7. Créer la réponse
             UserResponseDTO response = new UserResponseDTO();
             response.setId(user.getId());
+            response.setFirstName(user.getFirstName());
+            response.setLastName(user.getLastName());
             response.setEmail(user.getEmail());
             response.setActive(user.isActive());
             response.setRoles(allRoles);
