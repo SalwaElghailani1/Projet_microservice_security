@@ -49,7 +49,4 @@ public class User {
     @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
-
-
-
 }
