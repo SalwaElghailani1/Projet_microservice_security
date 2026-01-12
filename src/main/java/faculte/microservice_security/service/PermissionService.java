@@ -8,4 +8,5 @@ public interface PermissionService {
     PermissionEntity createPermission(String permissionName);
 
     List<PermissionEntity> getAllPermissions();
+    void deletePermission(Integer id);
 }

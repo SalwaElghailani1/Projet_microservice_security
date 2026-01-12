@@ -56,6 +56,7 @@ public class PermissionController {
         PermissionEntity permission = permissionService.createPermission(name);
         return ResponseEntity.status(HttpStatus.CREATED).body(permission);
     }
+
     @Operation(
             summary = "Lister toutes les permissions",
             description = "Retourne la liste de toutes les permissions existantes"
@@ -76,4 +77,57 @@ public class PermissionController {
         return ResponseEntity.ok(permissionService.getAllPermissions());
     }
 
+    @Operation(
+            summary = "Supprimer une permission",
+            description = "Supprime une permission par son ID. Note: Impossible de supprimer une permission utilisée par des rôles."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Permission supprimée avec succès",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Permission non trouvée"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Conflit - Permission utilisée par des rôles"
+            )
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePermission(
+            @Parameter(
+                    name = "id",
+                    description = "ID de la permission à supprimer",
+                    required = true,
+                    example = "1"
+            )
+            @PathVariable Integer id) {
+
+        try {
+            permissionService.deletePermission(id);
+            return ResponseEntity.ok("Permission supprimée avec succès");
+
+        } catch (RuntimeException e) {
+            // Gérer les erreurs spécifiques
+            if (e.getMessage().contains("non trouvée")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(e.getMessage());
+            } else if (e.getMessage().contains("Impossible de supprimer") ||
+                    e.getMessage().contains("assignée") ||
+                    e.getMessage().contains("utilisée")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Erreur: " + e.getMessage());
+            }
+        }
+    }
 }

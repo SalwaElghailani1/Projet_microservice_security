@@ -101,4 +101,14 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.Entity_to_DTO(user);
     }
+    @Override
+    public UserResponseDTO updateUserStatus(Integer id, Boolean active) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setActive(active);
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.Entity_to_DTO(updatedUser);
+    }
 }
