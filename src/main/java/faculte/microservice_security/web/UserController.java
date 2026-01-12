@@ -26,7 +26,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -143,11 +145,27 @@ public class UserController {
                     schema = @Schema(implementation = UserResponseDTO[].class)
             )
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers(@AuthenticationPrincipal Jwt jwt) {
+        List<UserResponseDTO> users = userService.getAllUsers(); // fetch all users
+        List<String> roles = jwt.getClaim("roles"); // roles dyal current user
+
+        if (roles.contains("ADMIN")) {
+            // ADMIN yjib kolchi
+            return ResponseEntity.ok(users);
+        } else if (roles.contains("MANAGER")) {
+            // MANAGER yjib ghyr internal roles
+            List<String> internalRoles = List.of("HOUSEKEEPING", "RECEPTIONNISTE", "MAINTENANCE", "COMPTABLE", "MANAGER");
+            List<UserResponseDTO> filteredUsers = users.stream()
+                    .filter(u -> u.getRoles().stream().anyMatch(internalRoles::contains))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(filteredUsers);
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // li ma fihch ADMIN/MANAGER
+        }
     }
+
 
     @Operation(
             summary = "Supprimer un utilisateur",
