@@ -12,6 +12,7 @@ import java.util.List;
 
 @Service
 @Transactional
+
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
@@ -25,10 +26,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role createRole(String roleName) {
-
         Role role = new Role();
         role.setName(roleName);
-
         return roleRepository.save(role);
     }
 
@@ -42,10 +41,34 @@ public class RoleServiceImpl implements RoleService {
                 .orElseThrow(() -> new RuntimeException("Permission not found"));
 
         role.getPermissions().add(permission);
+        roleRepository.save(role); // ⭐ مهم بزاف
     }
+
+    @Override
+    public void removePermissionFromRole(String roleName, String permissionName) {
+
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        PermissionEntity permission = permissionRepository.findByName(permissionName)
+                .orElseThrow(() -> new RuntimeException("Permission not found"));
+
+        role.getPermissions().remove(permission);
+        roleRepository.save(role);
+    }
+
+    @Override
+    public void deleteRoleByName(String roleName) {
+
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        role.getPermissions().clear(); // حل مشكلة FK
+        roleRepository.delete(role);
+    }
+
     @Override
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
 }
-

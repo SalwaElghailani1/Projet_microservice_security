@@ -36,7 +36,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO request) {
-
         // Vérifier si email existe déjà
         if(userRepository.existsByEmail(request.getEmail())){
             UserResponseDTO response = new UserResponseDTO();
@@ -52,36 +51,27 @@ public class UserServiceImpl implements UserService {
         user.setActive(true);
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
+
         // Assigner le rôle si fourni
-        if(request.getRole() != null){
+        if(request.getRole() != null && !request.getRole().isEmpty()){
             for (String roleName : request.getRole()) {
                 Role role = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role non trouvé"));
+                        .orElseThrow(() -> new RuntimeException("Role non trouvé: " + roleName));
                 user.getRoles().add(role);
             }
         }
 
         // Sauvegarder en base
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        // Mapper vers le DTO de réponse
-        UserResponseDTO response = new UserResponseDTO();
-        response.setId(user.getId());
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setEmail(user.getEmail());
-        response.setActive(user.isActive());
-        response.setRoles(user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet()));
-        return response;
+        // UTILISER LE MAPPER COMME DANS getAllUsers() POUR AVOIR LA MÊME STRUCTURE
+        return userMapper.Entity_to_DTO(savedUser);
     }
-
-
 
     @Override
     public UserResponseDTO getUserById(Integer id) {
-        User user = userRepository.findById(id.intValue()).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id.intValue())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return userMapper.Entity_to_DTO(user);
     }
 
@@ -100,15 +90,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO assignRoleToUser(Integer userId, String roleName) {
-
         User user = userRepository.findById(userId.intValue())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
 
         user.getRoles().add(role);
+        userRepository.save(user); // Sauvegarder les changements
 
         return userMapper.Entity_to_DTO(user);
     }
 }
-
